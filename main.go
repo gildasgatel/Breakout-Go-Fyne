@@ -28,6 +28,7 @@ var (
 	life      *canvas.Text
 	label     *canvas.Text
 	contBrick *fyne.Container
+	gameover  bool
 )
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 	w = a.NewWindow("Beakout")
 	w.Resize(fyne.NewSize(400, 400))
 
+	gameover = false
 	game = true
 	vie = 3
 	withBrick = 80
@@ -63,15 +65,39 @@ func main() {
 
 func reset() {
 
-	caisse = 6
-	tbl2 := generateBrick()
-	tbl = tbl2
-	for _, b := range tbl {
-		b.Move(fyne.NewPos(b.Position().X, b.Position().Y+200))
-		contBrick.Add(b)
+	if point == 0 && vie == 3 {
+		newLevel()
 	}
+	if gameover {
+		contBrick.Objects = contBrick.Objects[:0]
+		life.Hide()
+		life.Refresh()
+		paddle.Hide()
+		paddle.Refresh()
+		contBrick.Refresh()
+		label.Color = color.NRGBA{204, 0, 0, 255}
+		label.Text = " GAME OVER "
+		label.TextSize = 50
+		contLabel.Show()
+		label.Refresh()
+		time.Sleep(time.Second * 5)
+		vie = 3
+		point = 0
+		withBrick = 80
+		gameover = false
+		reset()
 
+	}
+	life.Text = "Life: " + strconv.Itoa(vie) + " Level: " + strconv.Itoa(point+1)
+	if vie < 2 {
+		life.Color = color.NRGBA{204, 0, 0, 255}
+	} else {
+		life.Color = color.Black
+	}
+	paddle.Show()
+	life.Show()
 	label.Text = "PRESS SPACE TO START"
+	label.Color = color.Black
 	label.TextSize = 30
 
 	life.Refresh()
@@ -79,9 +105,19 @@ func reset() {
 	log.Println("reset game", caisse, vie)
 	contLabel.Show()
 	label.Refresh()
+	contBrick.Refresh()
 
 	game = true
 	startGame()
+}
+func newLevel() {
+	caisse = 6
+	tbl2 := generateBrick()
+	tbl = tbl2
+	for _, b := range tbl {
+		b.Move(fyne.NewPos(b.Position().X, b.Position().Y+200))
+		contBrick.Add(b)
+	}
 }
 func playGame() {
 
@@ -92,10 +128,10 @@ func playGame() {
 			checkColision(circle, tbl)
 			checkColisionWalls(circle, life)
 			checkColisonPaddle(circle, paddle)
-			checkWin()
 			circle.Move(fyne.NewPos(circle.Position1.X+nX, circle.Position1.Y+nY))
 			circle.Refresh()
 			time.Sleep(time.Millisecond * 40)
+			checkWin()
 		}
 		if !game {
 			reset()
@@ -139,20 +175,15 @@ func checkWin() {
 		game = false
 		time.Sleep(time.Second * 2)
 		point++
-		life.Text = "Vie: " + strconv.Itoa(vie) + " Point: " + strconv.Itoa(point)
 		withBrick -= 10
-
+		newLevel()
 	}
 	if vie <= 0 {
-		point = 0
-		label.Text = " GAME OVER "
-		label.TextSize = 50
-		contLabel.Show()
-		label.Refresh()
-		time.Sleep(time.Second * 2)
+		gameover = true
 		game = false
 	}
 }
+
 func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 	if circle.Position().X < 0 {
 		nX = nX - nX*2
@@ -165,13 +196,8 @@ func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 	}
 	if circle.Position().Y > 400 {
 		vie--
-		life.Text = "Vie: " + strconv.Itoa(vie) + " Point: " + strconv.Itoa(point)
-		if vie < 2 {
-			life.Color = color.NRGBA{204, 0, 0, 255}
-		}
-		circle.Move(fyne.NewPos(200, 330))
-		nX = 0
-		nY = 0
+		game = false
+		return
 	}
 }
 
