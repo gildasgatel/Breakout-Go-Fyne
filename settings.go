@@ -41,8 +41,6 @@ func newPaddle(w, h, pX, pY float32) *canvas.Rectangle {
 	b := canvas.NewRectangle(color.Black)
 	b.Resize(fyne.NewSize(w, h))
 	b.Move(fyne.NewPos(pX-w/2, pY))
-	b.StrokeWidth = 2
-	b.StrokeColor = color.NRGBA{102, 0, 0, 255}
 
 	return b
 }

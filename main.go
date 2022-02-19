@@ -48,22 +48,22 @@ func main() {
 	label.TextSize = 30
 	contLabel = container.NewMax(label)
 	contLabel.Move(fyne.NewPos(15, 185))
+	tapp := newTappable()
 
-	contBrick = fyne.NewContainerWithoutLayout()
+	contBrick = container.NewWithoutLayout()
 
 	reset()
 
-	//startGame()
-
-	cont := fyne.NewContainerWithoutLayout(bg, circle, paddle, contBrick, life, contLabel)
-	w.SetContent(cont)
+	cont := container.NewWithoutLayout(bg, circle, contBrick, life, contLabel, paddle)
+	contTapp := container.NewMax(tapp, cont)
+	w.SetContent(contTapp)
 	w.ShowAndRun()
 
 }
+
 func reset() {
 
 	caisse = 6
-
 	tbl2 := generateBrick()
 	tbl = tbl2
 	for _, b := range tbl {
@@ -143,6 +143,15 @@ func checkWin() {
 		withBrick -= 10
 
 	}
+	if vie <= 0 {
+		point = 0
+		label.Text = " GAME OVER "
+		label.TextSize = 50
+		contLabel.Show()
+		label.Refresh()
+		time.Sleep(time.Second * 2)
+		game = false
+	}
 }
 func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 	if circle.Position().X < 0 {
@@ -159,11 +168,6 @@ func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 		life.Text = "Vie: " + strconv.Itoa(vie) + " Point: " + strconv.Itoa(point)
 		if vie < 2 {
 			life.Color = color.NRGBA{204, 0, 0, 255}
-		}
-		if vie <= 0 {
-			label.Text = " GAME OVER "
-			label.TextSize = 50
-			game = false
 		}
 		circle.Move(fyne.NewPos(200, 330))
 		nX = 0
