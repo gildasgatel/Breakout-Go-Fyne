@@ -111,6 +111,7 @@ func reset() {
 	startGame()
 }
 func newLevel() {
+	contBrick.Objects = contBrick.Objects[:0]
 	caisse = 6
 	tbl2 := generateBrick()
 	tbl = tbl2
@@ -138,7 +139,6 @@ func playGame() {
 		}
 	}()
 }
-
 func startGame() {
 	log.Println("start game")
 	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
@@ -158,14 +158,12 @@ func startGame() {
 		}
 	})
 }
-
 func checkColisonPaddle(circle *canvas.Circle, paddle *canvas.Rectangle) {
 	if circle.Position().Y+circle.Size().Height == paddle.Position().Y && circle.Position1.X+circle.Size().Width/2 > paddle.Position().X && circle.Position1.X+circle.Size().Width/2 < paddle.Position().X+paddle.Size().Width {
 		nY = nY - nY*2
 		nX = calculAngle(circle.Position().X, paddle.Position().X)
 	}
 }
-
 func checkWin() {
 	if caisse <= 0 {
 		label.Text = " YOU WIN "
@@ -183,7 +181,6 @@ func checkWin() {
 		game = false
 	}
 }
-
 func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 	if circle.Position().X < 0 {
 		nX = nX - nX*2
@@ -200,20 +197,17 @@ func checkColisionWalls(circle *canvas.Circle, life *canvas.Text) {
 		return
 	}
 }
-
 func checkColision(c *canvas.Circle, tbl []*canvas.Rectangle) {
 	for _, v := range tbl {
 		colision(c, v)
 	}
 }
-
 func calculAngle(c, p float32) float32 {
 	var result float32
 	centre := p + 50
 	result = (centre - c) / 10
 	return result - (result * 2)
 }
-
 func colision(c *canvas.Circle, b *canvas.Rectangle) {
 
 	// colision dessus
@@ -260,7 +254,6 @@ func colision(c *canvas.Circle, b *canvas.Rectangle) {
 	}
 
 }
-
 func generateBrick() (tbl []*canvas.Rectangle) {
 
 	col := 250
