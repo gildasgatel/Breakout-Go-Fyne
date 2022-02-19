@@ -33,7 +33,7 @@ var (
 
 func main() {
 	a := app.New()
-	w = a.NewWindow("Beakout")
+	w = a.NewWindow("Breakout")
 	w.Resize(fyne.NewSize(400, 400))
 
 	gameover = false
@@ -142,11 +142,12 @@ func playGame() {
 func startGame() {
 	log.Println("start game")
 	w.Canvas().SetOnTypedKey(func(ke *fyne.KeyEvent) {
-		if ke.Name == fyne.KeyLeft && paddle.Position().X > 0 {
+		log.Println(ke.Physical)
+		if ke.Name == fyne.KeyLeft && paddle.Position().X > 0 || ke.Name == fyne.KeyQ && paddle.Position().X > 0 {
 			paddle.Move(fyne.NewPos(paddle.Position().X-20, paddle.Position().Y))
 			paddle.Refresh()
 		}
-		if ke.Name == fyne.KeyRight && paddle.Position().X < 300 {
+		if ke.Name == fyne.KeyRight && paddle.Position().X < 300 || ke.Name == fyne.KeyD && paddle.Position().X < 300 {
 			paddle.Move(fyne.NewPos(paddle.Position().X+20, paddle.Position().Y))
 			paddle.Refresh()
 		}
